@@ -3519,7 +3519,7 @@
         };
 
         // Google Sheet Configuration
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyB18Jr3CD2Yw07SuZka5BdJxrfKVWRIPDSHhv3aPLwe1pzxgGr4V-c2PIveoHs2ZDz/exec'; // Replace with your deployment URL
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9Hr6Tsd-CsZr5F_ta4ti7Ub4PqRNXULxZKRnRy7aQnFhuqzBhJ0l2LZzPFCLi68qFTA/exec'; // Replace with your deployment URL
         const WHATSAPP_NUMBER = '6374713251'; // Your WhatsApp number
 
         // Global variables
@@ -3785,6 +3785,7 @@
         // NEW CODE - SECURE VERSION
         async function storeInGoogleSheet(data) {
             try {
+                console.log('📊 Sending data to Google Sheets...', data);
                 const payload = {
                     assetCode: data.assetCode,
                     stationName: data.stationName,
@@ -3800,6 +3801,7 @@
 
                 const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
