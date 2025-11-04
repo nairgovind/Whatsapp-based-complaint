@@ -402,29 +402,29 @@
                     
                     <div class="form-group">
                         <label for="name" class="required">Name</label>
-                        <input type="text" id="name" name="name" placeholder="Enter your full name" maxlength="100">
+                        <input type="text" id="name" name="name" placeholder="Enter your full name" maxlength="100" autocomplete="name">
                         <div class="validation-error" id="nameError">Name is required (2-100 characters)</div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="mobile" class="required">Mobile Number</label>
-                            <input type="tel" id="mobile" name="mobile" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric">
+                            <input type="tel" id="mobile" name="mobile" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" autocomplete="tel">
                             <div class="field-info">Format: 10 digits (e.g., 9876543210)</div>
                             <div class="validation-error" id="mobileError">Mobile number must be exactly 10 digits</div>
                         </div>
 
                         <div class="form-group">
                             <label for="pnr" class="required">PNR/UTS Number</label>
-                            <input type="text" id="pnr" name="pnr" placeholder="10-digit PNR/UTS" maxlength="10" inputmode="numeric">
-                            <div class="field-info">Format: 10 digits (e.g., 2025000123)</div>
+                            <input type="text" id="pnr" name="pnr" placeholder="10-digit PNR/UTS" maxlength="10" autocomplete="off">
+                            <div class="field-info">Format: 10 digits-can be alphanumeric</div>
                             <div class="validation-error" id="pnrError">PNR/UTS must be exactly 10 digits</div>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="email">Email (Optional)</label>
-                        <input type="email" id="email" name="email" placeholder="your.email@example.com">
+                        <input type="email" id="email" name="email" placeholder="your.email@example.com" autocomplete="email">
                         <div class="validation-error" id="emailError">Please enter a valid email address</div>
                     </div>
                 </div>
@@ -3631,12 +3631,12 @@
 
             document.getElementById('pnr').addEventListener('blur', () => {
                 const pnr = document.getElementById('pnr').value.trim();
-                const isValid = /^\d{10}$/.test(pnr);
+                 const isValid = /^[A-Z0-9]{10}$/.test(pnr.toUpperCase()); 
                 updateFieldValidation('pnr', isValid);
             });
 
             document.getElementById('pnr').addEventListener('input', (e) => {
-                e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+               e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
             });
 
             document.getElementById('email').addEventListener('blur', () => {
@@ -3725,7 +3725,7 @@
             }
 
             const pnr = document.getElementById('pnr').value.trim();
-            if (!/^\d{10}$/.test(pnr)) {
+            if (!/^[A-Z0-9]{10}$/.test(pnr.toUpperCase())) {
                 updateFieldValidation('pnr', false);
                 isValid = false;
             }
@@ -3760,7 +3760,7 @@
           message += `Licensee: ${data.licenseeName}\n\n`;
           
           message += `📋 *Issue Type:* ${data.issueType}\n`;
-          message += `📋*Sub-Type:* ${data.subtypes}\n\n`;
+          message += `📋 *Sub-Type:* ${data.subtypes}\n\n`;
           
           message += `👤 *User Information*\n`;
           message += `Name: ${data.name}\n`;
