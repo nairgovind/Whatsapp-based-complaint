@@ -1,0 +1,3502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAISE - Railway Asset Issue Escalation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .asset-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .asset-info h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            min-width: 120px;
+            opacity: 0.9;
+        }
+
+        .info-value {
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Footer Styles */
+        footer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            font-size: 12px;
+            border-top: 2px solid #667eea;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        footer p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        /* Mobile View */
+        @media (max-width: 768px) {
+            footer {
+                padding: 15px;
+                font-size: 11px;
+                margin-top: 30px;
+            }
+            
+            footer p {
+                line-height: 1.4;
+            }
+        }
+
+        /* Extra Small Devices */
+        @media (max-width: 480px) {
+            footer {
+                padding: 12px;
+                font-size: 10px;
+            }
+        }
+
+        @media print {
+            footer {
+                display: none;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+          <h1><img src="data:image/jpeg;base64,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" 
+            alt="Indian Railways" 
+            style="height: 40px; vertical-align: middle; margin-right: 10px;">
+            RAISE - Railway Asset Issue Escalation System
+          </h1>
+          <p>Report an issue with railway assets</p>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <div class="asset-info" id="assetInfo" style="display: none;">
+            <h2>Asset Details</h2>
+            <div class="info-row">
+                <span class="info-label">Asset Code:</span>
+                <span class="info-value" id="assetCode">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Station:</span>
+                <span class="info-value" id="stationName">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Station Code:</span>
+                <span class="info-value" id="stationCode">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Location:</span>
+                <span class="info-value" id="location">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Type:</span>
+                <span class="info-value" id="assetType">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Licensee:</span>
+                <span class="info-value" id="licenseeName">-</span>
+            </div>
+        </div>
+
+        <form id="complaintForm">
+            <div class="form-group">
+                <label for="name">Your Name <span class="required">*</span></label>
+                <input type="text" id="name" name="name" required placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group">
+                <label for="mobile">Mobile Number <span class="required">*</span></label>
+                <input type="tel" id="mobile" name="mobile" required 
+                       pattern="[0-9]{10}"
+                       maxlength="10" 
+                       placeholder="10-digit mobile number">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email (Optional)</label>
+                <input type="email" id="email" name="email" placeholder="your.email@example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="pnruts">PNR/UTS Number <span class="required">*</span> </label>
+                <input type="text" id="pnruts" name="pnruts" maxlength="10" placeholder="Enter your PNR/UTS Number">
+            </div>
+
+            <div class="form-group">
+                <label for="complaintType">Complaint Type <span class="required">*</span></label>
+                <select id="complaintType" name="complaintType" required>
+                    <option value="">Select complaint type</option>
+                    <option value="Cleanliness">Cleanliness Issue</option>
+                    <option value="Maintenance">Maintenance Required</option>
+                    <option value="Functionality">Not Working/Functional Issue</option>
+                    <option value="Staff Behavior">Staff Behavior</option>
+                    <option value="Overcharging">Overcharging</option>
+                    <option value="Safety">Safety Concern</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="complaint">Complaint Details <span class="required">*</span></label>
+                <textarea id="complaint" name="complaint" required 
+                          placeholder="Please describe your complaint in detail..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Submit Complaint via WhatsApp</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #667eea;">Preparing your complaint...</p>
+        </div>
+    </div>
+
+    <script>
+
+        // Replace this with your Google Apps Script Web App URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBmI5hZYs-MvvjQCrviAzUFE4CkfNzq29cxR3E_Dyd32244BT477pQM7Fu-l0-PnmBpQ/exec';
+        // Asset database - EMBEDDED DATA
+        const assetDatabase = {
+  "PnU-MAS-PRGL-Toi-174": {
+    "assetCode": "PnU-MAS-PRGL-Toi-174",
+    "stationCode": "PRGL",
+    "stationName": "Perungalathur",
+    "location": "PF-1",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s. J V Enterprises",
+    "category": "PAUT"
+  },
+  "PnU-MAS-NBK-Toi-176": {
+    "assetCode": "PnU-MAS-NBK-Toi-176",
+    "stationCode": "NBK",
+    "stationName": "Nungambakkam",
+    "location": "Not Available",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "Shri. M. Elangovan",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TRT-Toi-311": {
+    "assetCode": "PnU-MAS-TRT-Toi-311",
+    "stationCode": "TRT",
+    "stationName": "Tiruttani",
+    "location": "Not Available",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Gada Lalitha-Guntur",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MAS-Toi-283": {
+    "assetCode": "PnU-MAS-MAS-Toi-283",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Old concourse of Chennai central",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Meenakshi- Tiruvallur",
+    "category": "PAUT"
+  },
+  "PnU-MAS-PV-Toi-322": {
+    "assetCode": "PnU-MAS-PV-Toi-322",
+    "stationCode": "PV",
+    "stationName": "Pallavaram",
+    "location": "PF-1 (TBM end)",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Om Saravana Enterprises- Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TI-Toi-227": {
+    "assetCode": "PnU-MAS-TI-Toi-227",
+    "stationCode": "TI",
+    "stationName": "Tiruninravur",
+    "location": "Concourse area (Near PF-5)",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Apex assosciates - Coimbatore",
+    "category": "PAUT"
+  },
+  "PnU-MAS-JTJ-Toi-326": {
+    "assetCode": "PnU-MAS-JTJ-Toi-326",
+    "stationCode": "JTJ",
+    "stationName": "Jolarpettai",
+    "location": "PF-2&3(MAS end), PF-2&3(BNC end), PF-4&5(MAS end), PF-4&5(BNC end)",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Apex assosciates - Coimbatore",
+    "category": "PAUT"
+  },
+  "PnU-MAS-STM-Toi-332": {
+    "assetCode": "PnU-MAS-STM-Toi-332",
+    "stationCode": "STM",
+    "stationName": "St. Thomas Mount",
+    "location": "PF-1&2 (TBM end), East side entrance",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s S Uma Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-SPE-Toi-320": {
+    "assetCode": "PnU-MAS-SPE-Toi-320",
+    "stationCode": "SPE",
+    "stationName": "Sullurupetta",
+    "location": "PF-1 (near BO), PF-1 (ODUR end), PF-2&3(ODUR end)",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s S Uma - Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MBM-Toi-321": {
+    "assetCode": "PnU-MAS-MBM-Toi-321",
+    "stationCode": "MBM",
+    "stationName": "Mambalam",
+    "location": "PF-1 (TBM end)",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s. Saisharath Subbian and Co",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TMV-Toi-293": {
+    "assetCode": "PnU-MAS-TMV-Toi-293",
+    "stationCode": "TMV",
+    "stationName": "Tindivanam",
+    "location": "Middle of PF-1",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Nagamoorthi S Villupuram",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TYMR-Toi-344": {
+    "assetCode": "PnU-MAS-TYMR-Toi-344",
+    "stationCode": "TYMR",
+    "stationName": "Thiruvanmiyur",
+    "location": "2nd floor (PF-2)",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s A Kanchana-Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TRMN-Toi-345": {
+    "assetCode": "PnU-MAS-TRMN-Toi-345",
+    "stationCode": "TRMN",
+    "stationName": "Taramani",
+    "location": "2nd floor (PF-2)",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Maran Enterprises - Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MCPT-Toi-333": {
+    "assetCode": "PnU-MAS-MCPT-Toi-333",
+    "stationCode": "MCPT",
+    "stationName": "Chintadripet",
+    "location": "Mezzanine floor",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Praveen Enterprises - Tiruvallur",
+    "category": "PAUT"
+  },
+  "PnU-MAS-KTBR-Toi-342": {
+    "assetCode": "PnU-MAS-KTBR-Toi-342",
+    "stationCode": "KTBR",
+    "stationName": "Kasthurba Nagar",
+    "location": "2nd floor (PF-2)",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Praveen Enterprises - Tiruvallur",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MTMY-Toi-338": {
+    "assetCode": "PnU-MAS-MTMY-Toi-338",
+    "stationCode": "MTMY",
+    "stationName": "Thirumayilai",
+    "location": "Mezzanine floor",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s S Uma - Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MCPK-Toi-334": {
+    "assetCode": "PnU-MAS-MCPK-Toi-334",
+    "stationCode": "MCPK",
+    "stationName": "Chepauk",
+    "location": "Mezzanine floor",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s S Uma - Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MTCN-Toi-335": {
+    "assetCode": "PnU-MAS-MTCN-Toi-335",
+    "stationCode": "MTCN",
+    "stationName": "Tiruvallikeni",
+    "location": "Mezzanine floor",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Praveen Enterprises - Tiruvallur",
+    "category": "PAUT"
+  },
+  "PnU-MAS-INDR-Toi-343": {
+    "assetCode": "PnU-MAS-INDR-Toi-343",
+    "stationCode": "INDR",
+    "stationName": "IndraNagar",
+    "location": "2nd floor (PF-2)",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Praveen Enterprises - Tiruvallur",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MKK-Toi-170": {
+    "assetCode": "PnU-MAS-MKK-Toi-170",
+    "stationCode": "MKK",
+    "stationName": "Kodambakkam",
+    "location": "PF-1&2 (TBM end), Main entrance",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s S Uma - Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-AJJ-Toi-316": {
+    "assetCode": "PnU-MAS-AJJ-Toi-316",
+    "stationCode": "AJJ",
+    "stationName": "Arakkonam Jn",
+    "location": "PF-1&1A, PF-2&3, PF-4&5, PF-6&7",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Harikrishnan M- Coimbatore",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TBM-Toi-351": {
+    "assetCode": "PnU-MAS-TBM-Toi-351",
+    "stationCode": "TBM",
+    "stationName": "Tambaram (PF 5/6)",
+    "location": "PF-5&6",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s J V Enterprises - Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TBM-Toi-349": {
+    "assetCode": "PnU-MAS-TBM-Toi-349",
+    "stationCode": "TBM",
+    "stationName": "Tambaram (East)",
+    "location": "East entrance of TBM Station",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s S Uma - Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TBM-Toi-350": {
+    "assetCode": "PnU-MAS-TBM-Toi-350",
+    "stationCode": "TBM",
+    "stationName": "Tambaram (PF 1/2)",
+    "location": "PF-1&2",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Harikrishnan M- Coimbatore",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MAS-Toi-313": {
+    "assetCode": "PnU-MAS-MAS-Toi-313",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "New concourse of Chennai central",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Lakshmi Agencies-Rangareddy",
+    "category": "PAUT"
+  },
+  "PnU-MAS-SKL-Toi-348": {
+    "assetCode": "PnU-MAS-SKL-Toi-348",
+    "stationCode": "SKL",
+    "stationName": "Singaperumal koil",
+    "location": "Entrance from GST road (TBM end)",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Binco Services LLP- Kozhikode",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MSB-Toi-318": {
+    "assetCode": "PnU-MAS-MSB-Toi-318",
+    "stationCode": "MSB",
+    "stationName": "Chennai Beach",
+    "location": "Concourse area",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Forbes Elite Technology-Jodhpur",
+    "category": "PAUT"
+  },
+  "PnU-MAS-GI-Toi-369": {
+    "assetCode": "PnU-MAS-GI-Toi-369",
+    "stationCode": "GI",
+    "stationName": "Guduvancheri",
+    "location": "Station entrance (ROB side)",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "Shri Nagamoorthi S-Viluppuram",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MPK-Toi-370": {
+    "assetCode": "PnU-MAS-MPK-Toi-370",
+    "stationCode": "MPK",
+    "stationName": "Chennai Park",
+    "location": "PF-1 (middle of platform) & PF-1 (MS end)",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s. Saisharath Subbian and Co",
+    "category": "PAUT"
+  },
+  "PnU-MAS-PON-Toi-310": {
+    "assetCode": "PnU-MAS-PON-Toi-310",
+    "stationCode": "PON",
+    "stationName": "Ponneri",
+    "location": "Circulating area, PF-1",
+    "type": "PAUT (Revenue Model)",
+    "licenseeName": "M/s Praveen Enterprises - Tiruvallur",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MASS-Toi-211": {
+    "assetCode": "PnU-MAS-MASS-Toi-211",
+    "stationCode": "MASS",
+    "stationName": "Chennai Suburban ",
+    "location": "PF-15 of MASS",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "Sri. M. Harikrishnan",
+    "category": "PAUT"
+  },
+  "PnU-MAS-KPD-Toi-210": {
+    "assetCode": "PnU-MAS-KPD-Toi-210",
+    "stationCode": "KPD",
+    "stationName": "Katpadi",
+    "location": "PF-1 (MAS end & JTJ end), PF-2/3",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "M/s. Vijaya Durga Enterprises-Krishna",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MAS-Toi-201": {
+    "assetCode": "PnU-MAS-MAS-Toi-201",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Near Gate no 6 of chennai central",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "M/s Saisharath Subbian & Co.",
+    "category": "PAUT"
+  },
+  "PnU-MAS-AVD-Toi-196": {
+    "assetCode": "PnU-MAS-AVD-Toi-196",
+    "stationCode": "AVD",
+    "stationName": "Avadi",
+    "location": "PF-1 (MAS end),\nPF-1(AJJ end)",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "Sun Motor Parts-Coimbatore",
+    "category": "PAUT"
+  },
+  "PnU-MAS-VEU-Toi-266": {
+    "assetCode": "PnU-MAS-VEU-Toi-266",
+    "stationCode": "VEU",
+    "stationName": "Veppampattu",
+    "location": "PF-1 (AJJ end)",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "Sri Balaji Foods and Beverages-Vijayawada",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MJR-Toi-269": {
+    "assetCode": "PnU-MAS-MJR-Toi-269",
+    "stationCode": "MJR",
+    "stationName": "Minjur",
+    "location": "Concourse area, PF-1",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "Bhathmavathy Enterprises - Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-PER-Toi-305": {
+    "assetCode": "PnU-MAS-PER-Toi-305",
+    "stationCode": "PER",
+    "stationName": "Perambur",
+    "location": "PF-1 (AJJ end)",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "S Uma- Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-SP-Toi-306": {
+    "assetCode": "PnU-MAS-SP-Toi-306",
+    "stationCode": "SP",
+    "stationName": "Saidapet",
+    "location": "Concourse area, PF-1&2(TBM end)",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "VM Enterprises-Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-BBQ-Toi-302": {
+    "assetCode": "PnU-MAS-BBQ-Toi-302",
+    "stationCode": "BBQ",
+    "stationName": "Basin Bridge",
+    "location": "PF-2&3 (AJJ end)",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "S Uma- Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-ABU-Toi-300": {
+    "assetCode": "PnU-MAS-ABU-Toi-300",
+    "stationCode": "ABU",
+    "stationName": "Ambattur",
+    "location": "PF-1 (AJJ end)",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "M/s. Saisharath Subbian and Co",
+    "category": "PAUT"
+  },
+  "PnU-MAS-VLK-Toi-169": {
+    "assetCode": "PnU-MAS-VLK-Toi-169",
+    "stationCode": "VLK",
+    "stationName": "Villivakkam",
+    "location": "PF-1",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "S Uma- Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-PAB-Toi-301": {
+    "assetCode": "PnU-MAS-PAB-Toi-301",
+    "stationCode": "PAB",
+    "stationName": "Pattabiram",
+    "location": "PF-1 (AJJ end)",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "M/s Praveen Enterprises - Tiruvallur",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TBM-Toi-354": {
+    "assetCode": "PnU-MAS-TBM-Toi-354",
+    "stationCode": "TBM",
+    "stationName": "Tambaram West",
+    "location": "West side of station (near GST road)",
+    "type": "PAUT (ROMT Model)",
+    "licenseeName": "S Uma- Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-JTJ-Toi-279": {
+    "assetCode": "PnU-MAS-JTJ-Toi-279",
+    "stationCode": "JTJ",
+    "stationName": "Jollarpettai",
+    "location": "Not Available",
+    "type": "PAUT (BOT Model)",
+    "licenseeName": "M/s. Saisharath Subbian and Co",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MJR-Toi-353": {
+    "assetCode": "PnU-MAS-MJR-Toi-353",
+    "stationCode": "MJR",
+    "stationName": "Minjur",
+    "location": "Not Available",
+    "type": "PAUT (BOT Model)",
+    "licenseeName": "M/s S Uma - Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-AVD-Toi-364": {
+    "assetCode": "PnU-MAS-AVD-Toi-364",
+    "stationCode": "AVD",
+    "stationName": "Avadi",
+    "location": "Not Available",
+    "type": "PAUT (BOT Model)",
+    "licenseeName": "Awarded to Hexion Solutions-Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-CGL-Toi-358": {
+    "assetCode": "PnU-MAS-CGL-Toi-358",
+    "stationCode": "CGL",
+    "stationName": "Chengalpattu",
+    "location": "Not Available",
+    "type": "PAUT (BOT Model)",
+    "licenseeName": "M/s. Saisharath Subbian and Co",
+    "category": "PAUT"
+  },
+  "PnU-MAS-PV-Toi-355": {
+    "assetCode": "PnU-MAS-PV-Toi-355",
+    "stationCode": "PV",
+    "stationName": "Pallavaram",
+    "location": "Not Available",
+    "type": "PAUT (BOT Model)",
+    "licenseeName": "Awarded to Hexion Solutions-Chennai",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TBM-Toi-359": {
+    "assetCode": "PnU-MAS-TBM-Toi-359",
+    "stationCode": "TBM",
+    "stationName": "Tambaram",
+    "location": "Not Available",
+    "type": "PAUT (BOT Model)",
+    "licenseeName": "M/s Sun Motor Parts",
+    "category": "PAUT"
+  },
+  "PnU-MAS-POTI-Toi-361": {
+    "assetCode": "PnU-MAS-POTI-Toi-361",
+    "stationCode": "POTI",
+    "stationName": "Potheri",
+    "location": "Not Available",
+    "type": "PAUT (BOT Model)",
+    "licenseeName": "M/s JV Enterprises",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TMV-Toi-368": {
+    "assetCode": "PnU-MAS-TMV-Toi-368",
+    "stationCode": "TMV",
+    "stationName": "Tindivanam",
+    "location": "Not Available",
+    "type": "PAUT (BOT Model)",
+    "licenseeName": "Shri Nagamoorthi S-Viluppuram",
+    "category": "PAUT"
+  },
+  "PnU-MAS-KPD-WRL-18": {
+    "assetCode": "PnU-MAS-KPD-WRL-18",
+    "stationCode": "KPD",
+    "stationName": "Katpadi",
+    "location": "PF-1",
+    "type": "ACWH",
+    "licenseeName": "Sri. Mannepalli Venkata Ramanaiah",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MAS-WRL-248": {
+    "assetCode": "PnU-MAS-MAS-WRL-248",
+    "stationCode": "MAS ",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Old concourse 1st floor",
+    "type": "ACWH",
+    "licenseeName": "M/s. Saisharath Subbian and Co",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MBM-WRL-284": {
+    "assetCode": "PnU-MAS-MBM-WRL-284",
+    "stationCode": "MBM",
+    "stationName": "Mambalam",
+    "location": "PF-1",
+    "type": "ACWH",
+    "licenseeName": "Sri. R. Subburaj",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TRL-WRL-225": {
+    "assetCode": "PnU-MAS-TRL-WRL-225",
+    "stationCode": "TRL",
+    "stationName": "Tiruvallur",
+    "location": "PF-1(AJJ end), PF-1(middle of PF)",
+    "type": "ACWH",
+    "licenseeName": "M/s. Maruthi Enterprises-Thiruchirappalli",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MS-WRL-324": {
+    "assetCode": "PnU-MAS-MS-WRL-324",
+    "stationCode": "MS",
+    "stationName": "Chennai Egmore",
+    "location": "PF-4",
+    "type": "ACWH",
+    "licenseeName": "Sri. R. Subburaj",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TRT-WRL-373": {
+    "assetCode": "PnU-MAS-TRT-WRL-373",
+    "stationCode": "TRT",
+    "stationName": "Tiruttani",
+    "location": "Not Available",
+    "type": "ACWH",
+    "licenseeName": "M/s Vijaya Durga enterprises",
+    "category": "PAUT"
+  },
+  "MSS-MAS-TBM-BCA-12": {
+    "assetCode": "MSS-MAS-TBM-BCA-12",
+    "stationCode": "TBM",
+    "stationName": "Tambaram",
+    "location": "Not Available",
+    "type": "Battery Operated Carts",
+    "licenseeName": "M/s. Balaji Catering Service(3 cars)",
+    "category": "PAUT"
+  },
+  "MSS-MAS-MAS-BCA-23": {
+    "assetCode": "MSS-MAS-MAS-BCA-23",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Battery Operated Carts",
+    "licenseeName": "Sri. R. Subburaj(5 cars)",
+    "category": "PAUT"
+  },
+  "MSS-MAS-MS-BCA-24": {
+    "assetCode": "MSS-MAS-MS-BCA-24",
+    "stationCode": "MS",
+    "stationName": "Chennai Egmore",
+    "location": "Not Available",
+    "type": "Battery Operated Carts",
+    "licenseeName": "M/s. Balaji Catering Service(4 cars)",
+    "category": "PAUT"
+  },
+  "PnU-MAS-TBM-WRL-296": {
+    "assetCode": "PnU-MAS-TBM-WRL-296",
+    "stationCode": "TBM",
+    "stationName": "Tambaram",
+    "location": "Concourse area",
+    "type": "Cloak Room",
+    "licenseeName": "M/s Sun Motor Parts",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MAS-WRL-200": {
+    "assetCode": "PnU-MAS-MAS-WRL-200",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "New concourse of Chennai central (from entrance of Gate 6)",
+    "type": "Cloak Room",
+    "licenseeName": "M/s Narmadha Enterprises-Chengalpattu",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MS-WRL-282": {
+    "assetCode": "PnU-MAS-MS-WRL-282",
+    "stationCode": "MS",
+    "stationName": "Chennai Egmore",
+    "location": "PF-4",
+    "type": "Cloak Room",
+    "licenseeName": "M/s Sudhir Purbey Enterprises - Darbhanga",
+    "category": "PAUT"
+  },
+  "MSS-MAS-MAS-MedStn-15": {
+    "assetCode": "MSS-MAS-MAS-MedStn-15",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Concourse area",
+    "type": "EMR",
+    "licenseeName": "M/s. Apollo Pharmacies Limited(46.69 sqm)",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MAS-WRL-255": {
+    "assetCode": "PnU-MAS-MAS-WRL-255",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Concourse area",
+    "type": "Executive Lounge",
+    "licenseeName": "M/s. Ten 11 Hospitality",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MS-WRL-213": {
+    "assetCode": "PnU-MAS-MS-WRL-213",
+    "stationCode": "MS",
+    "stationName": "Chennai Egmore",
+    "location": "1st floor of concourse area",
+    "type": "Executive Lounge",
+    "licenseeName": "M/s S Uma",
+    "category": "PAUT"
+  },
+  "PnU-MAS-MAS-WRL-287": {
+    "assetCode": "PnU-MAS-MAS-WRL-287",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Old concourse area",
+    "type": "Digital Locker",
+    "licenseeName": "M/s Sun Motor Parts",
+    "category": "PAUT"
+  },
+  "MSS-MAS-KPD-DigiL-97": {
+    "assetCode": "MSS-MAS-KPD-DigiL-97",
+    "stationCode": "KPD",
+    "stationName": "Katpadi",
+    "location": "Concourse area near entrance",
+    "type": "Digital Locker",
+    "licenseeName": "M/s. Saisharath Subbian and Co",
+    "category": "PAUT"
+  },
+  "MSS-MAS-MLMR-DigiL-145": {
+    "assetCode": "MSS-MAS-MLMR-DigiL-145",
+    "stationCode": "MLMR",
+    "stationName": "Melmaruvathur",
+    "location": "Concourse area near main entrance",
+    "type": "Digital Locker",
+    "licenseeName": "M/s. Saisharath Subbian and Co",
+    "category": "PAUT"
+  },
+  "Not Available": {
+    "assetCode": "Not Available",
+    "stationCode": "VLCY",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "M/s.Kora Café (P) Ltd",
+    "category": "NFR"
+  },
+  "PARKING-PAB-01-2023-07": {
+    "assetCode": "PARKING-PAB-01-2023-07",
+    "stationCode": "PAB",
+    "stationName": "Pattabiram",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Jayabalan Parthasarathy",
+    "category": "PARKING"
+  },
+  "Parking-APB-2023-29": {
+    "assetCode": "Parking-APB-2023-29",
+    "stationCode": "APB",
+    "stationName": "Anuppambattu",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "K SANDHYA",
+    "category": "PARKING"
+  },
+  "PARKING-MAS-MKK-TW-269": {
+    "assetCode": "PARKING-MAS-MKK-TW-269",
+    "stationCode": "MKK",
+    "stationName": "Kodambakkam",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Gariba Nawaz Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-MAS-MCN-TW-242": {
+    "assetCode": "PARKING-MAS-MCN-TW-242",
+    "stationCode": "VN",
+    "stationName": "Vaniyambadi Site 1",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "J V Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-MAS-VN-TW-244-23": {
+    "assetCode": "PARKING-MAS-VN-TW-244-23",
+    "stationCode": "MCN",
+    "stationName": "Mukundarayapuram",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "M K Traders",
+    "category": "PARKING"
+  },
+  "HC-MX-249-23-1": {
+    "assetCode": "HC-MX-249-23-1",
+    "stationCode": "HC",
+    "stationName": "Hindu College",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Jayabalan Parthasarathy",
+    "category": "PARKING"
+  },
+  "MAS-MSF-MX-264-23-1": {
+    "assetCode": "MAS-MSF-MX-264-23-1",
+    "stationCode": "ESP",
+    "stationName": "Esplanade",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Sun Motor Parts",
+    "category": "PARKING"
+  },
+  "MAS-MTCN-MX-295-23-1": {
+    "assetCode": "MAS-MTCN-MX-295-23-1",
+    "stationCode": "MTCN",
+    "stationName": "Tiruvallikeni",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Sri Ganga Transports",
+    "category": "PARKING"
+  },
+  "GWYR-MX-167-23-1": {
+    "assetCode": "GWYR-MX-167-23-1",
+    "stationCode": "GWYR",
+    "stationName": "Greenways Road",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Gariba Nawaz Enterprises",
+    "category": "PARKING"
+  },
+  "MN-MX-271-23-1": {
+    "assetCode": "MN-MX-271-23-1",
+    "stationCode": "MN",
+    "stationName": "Minambakkam",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Om Saravana Enterprises",
+    "category": "PARKING"
+  },
+  "AJJ-MX-260-23-1": {
+    "assetCode": "AJJ-MX-260-23-1",
+    "stationCode": "AJJ",
+    "stationName": "Arakkonam Near BO",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Saisharath subbian & Co",
+    "category": "PARKING"
+  },
+  "TBM-MX-262-23-3": {
+    "assetCode": "TBM-MX-262-23-3",
+    "stationCode": "TBMS",
+    "stationName": "Tambaram Sanatorium",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Sun Motor Parts",
+    "category": "PARKING"
+  },
+  "TBMS-MX-253-23-4": {
+    "assetCode": "TBMS-MX-253-23-4",
+    "stationCode": "TBM",
+    "stationName": "Tambaram East Combined",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Sun Motor Parts",
+    "category": "PARKING"
+  },
+  "PV-TW-257-23-3": {
+    "assetCode": "PV-TW-257-23-3",
+    "stationCode": "PV",
+    "stationName": "Pallavaram West",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Om Saravana Enterprises",
+    "category": "PARKING"
+  },
+  "-MAS-TI-TW-156-": {
+    "assetCode": "-MAS-TI-TW-156-",
+    "stationCode": "TI",
+    "stationName": "Tiruninravur-1",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "A. Kanchana",
+    "category": "PARKING"
+  },
+  "PLMG-TW-276-23-2": {
+    "assetCode": "PLMG-TW-276-23-2",
+    "stationCode": "PLMG",
+    "stationName": "Puliyamangalam",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "KV Balaje Signal Contractor",
+    "category": "PARKING"
+  },
+  "PARKING-MTMY-2024-31": {
+    "assetCode": "PARKING-MTMY-2024-31",
+    "stationCode": "MTMY",
+    "stationName": "Tirumayilai",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "SS Multi Services",
+    "category": "PARKING"
+  },
+  "PARKING-pew-2024-34": {
+    "assetCode": "PARKING-pew-2024-34",
+    "stationCode": "PEW",
+    "stationName": "Perambur Loco Works",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Dharini. R",
+    "category": "PARKING"
+  },
+  "PARKING-MLHS-2024-36": {
+    "assetCode": "PARKING-MLHS-2024-36",
+    "stationCode": "MLHS",
+    "stationName": "Light House",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Similey Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-MCPT-2024-35": {
+    "assetCode": "PARKING-MCPT-2024-35",
+    "stationCode": "MCPT",
+    "stationName": "Chintadripet",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Dharini. R",
+    "category": "PARKING"
+  },
+  "PARKING-WST-2024-40": {
+    "assetCode": "PARKING-WST-2024-40",
+    "stationCode": "WST",
+    "stationName": "Washermanpet",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Dharini. R",
+    "category": "PARKING"
+  },
+  "PARKING-MKAK-2024-39": {
+    "assetCode": "PARKING-MKAK-2024-39",
+    "stationCode": "MKAk",
+    "stationName": "Mundagakanni Amman Koil",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Dharini. R",
+    "category": "PARKING"
+  },
+  "PARKING-AVD-2024-34": {
+    "assetCode": "PARKING-AVD-2024-34",
+    "stationCode": "AVD",
+    "stationName": "Avadi (Behind PRS)",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Harikrishnan. M",
+    "category": "PARKING"
+  },
+  "PARKING-VN-SITE2-2024-43": {
+    "assetCode": "PARKING-VN-SITE2-2024-43",
+    "stationCode": "VN",
+    "stationName": "Vaniyambadi Site 2",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "KGS Food caters",
+    "category": "PARKING"
+  },
+  "PARKING-TRT-2024-44": {
+    "assetCode": "PARKING-TRT-2024-44",
+    "stationCode": "TRT",
+    "stationName": "Tiruttani",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "M K Traders",
+    "category": "PARKING"
+  },
+  "PARKING-MMNK-2024-48": {
+    "assetCode": "PARKING-MMNK-2024-48",
+    "stationCode": "MMNK",
+    "stationName": "Maraimalai Nagar Kamarajar",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "M K Traders",
+    "category": "PARKING"
+  },
+  "PARKING-VDR-2024-49": {
+    "assetCode": "PARKING-VDR-2024-49",
+    "stationCode": "VDR",
+    "stationName": "Vandalur Site A",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Harikrishnan. M",
+    "category": "PARKING"
+  },
+  "PARKING-AB-2-2024-50": {
+    "assetCode": "PARKING-AB-2-2024-50",
+    "stationCode": "AB",
+    "stationName": "Ambur Site 2",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "M K Traders",
+    "category": "PARKING"
+  },
+  "PARKING-GYM-2-2024-51": {
+    "assetCode": "PARKING-GYM-2-2024-51",
+    "stationCode": "GYM",
+    "stationName": "Gudiyattam Site 2",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "M K Traders",
+    "category": "PARKING"
+  },
+  "PARKING-MNDY-2024-54": {
+    "assetCode": "PARKING-MNDY-2024-54",
+    "stationCode": "MNDY",
+    "stationName": "Mandaiveli",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Similey Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-KBT-2024-60": {
+    "assetCode": "PARKING-KBT-2024-60",
+    "stationCode": "KBT",
+    "stationName": "Kadambattur",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "J V Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-AJJ-SOUTH-2024-41": {
+    "assetCode": "PARKING-AJJ-SOUTH-2024-41",
+    "stationCode": "AJJ",
+    "stationName": "Arakkonam South E-Auction",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "J V Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-MAS-CAR-2024-67": {
+    "assetCode": "PARKING-MAS-CAR-2024-67",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": " ",
+    "type": "4 wheeler",
+    "licenseeName": "Narmadha Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-PCW-1-2024-72": {
+    "assetCode": "PARKING-PCW-1-2024-72",
+    "stationCode": "PCW",
+    "stationName": "Perambur Carriage Works - 1",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "J V Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-TRL-NEW-2024-68": {
+    "assetCode": "PARKING-TRL-NEW-2024-68",
+    "stationCode": "TRL",
+    "stationName": "Tiruvallur",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Simley Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-VLK-2024-71": {
+    "assetCode": "PARKING-VLK-2024-71",
+    "stationCode": "VLK",
+    "stationName": "Villivakkam",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Tushar Agencies",
+    "category": "PARKING"
+  },
+  "PARKING-KOTR-2024-73": {
+    "assetCode": "PARKING-KOTR-2024-73",
+    "stationCode": "KOTR",
+    "stationName": "Korattur",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Evergreen Homes",
+    "category": "PARKING"
+  },
+  "PARKING-PV-EAST-2024-75": {
+    "assetCode": "PARKING-PV-EAST-2024-75",
+    "stationCode": "PV",
+    "stationName": "Pallavaram East",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "C Surya",
+    "category": "PARKING"
+  },
+  "PARKING-GI-2024-85": {
+    "assetCode": "PARKING-GI-2024-85",
+    "stationCode": "GI",
+    "stationName": "Guduvancheri",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Smart Forwarders",
+    "category": "PARKING"
+  },
+  "PARKING-PRGD-2024-88": {
+    "assetCode": "PARKING-PRGD-2024-88",
+    "stationCode": "PRGD",
+    "stationName": "Perungudi",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Binco Services LLP",
+    "category": "PARKING"
+  },
+  "PARKING-CJE-2024-89": {
+    "assetCode": "PARKING-CJE-2024-89",
+    "stationCode": "CJE",
+    "stationName": "Kanchipuram East",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Apex Associates",
+    "category": "PARKING"
+  },
+  "PARKING-TBM-W-TW-1024-372": {
+    "assetCode": "PARKING-TBM-W-TW-1024-372",
+    "stationCode": "TBM",
+    "stationName": "Tambaram West",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Sun Motor Parts",
+    "category": "PARKING"
+  },
+  "PARKING-SKL-2024-96": {
+    "assetCode": "PARKING-SKL-2024-96",
+    "stationCode": "SKL",
+    "stationName": "Singaperumal Koil",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Binco Services LLP",
+    "category": "PARKING"
+  },
+  "PARKING-KPF-TW-2024-103": {
+    "assetCode": "PARKING-KPF-TW-2024-103",
+    "stationCode": "KPD",
+    "stationName": "Katpadi",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "J V Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-TRMN-SITE-1-2024-": {
+    "assetCode": "PARKING-TRMN-SITE-1-2024-",
+    "stationCode": "TRMN",
+    "stationName": "Taramani site 1",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Jayabalan Parthasarathy",
+    "category": "PARKING"
+  },
+  "PARKING-MS-2024-105": {
+    "assetCode": "PARKING-MS-2024-105",
+    "stationCode": "MS",
+    "stationName": "Chennai Egmore",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "M Harikrishnan",
+    "category": "PARKING"
+  },
+  "PARKING-PON-II-2024-108": {
+    "assetCode": "PARKING-PON-II-2024-108",
+    "stationCode": "PON",
+    "stationName": "Ponneri II Entry",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "J V Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-RPM-2024-109": {
+    "assetCode": "PARKING-RPM-2024-109",
+    "stationCode": "RPM",
+    "stationName": "Royapuram",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Binco Services LLP",
+    "category": "PARKING"
+  },
+  "MAS-STM-MX-361-24": {
+    "assetCode": "MAS-STM-MX-361-24",
+    "stationCode": "STM",
+    "stationName": "St. Thomas Mount",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Ever Green Homes",
+    "category": "PARKING"
+  },
+  "PARKING_MAS-2024-PUT-116": {
+    "assetCode": "PARKING_MAS-2024-PUT-116",
+    "stationCode": "PUT",
+    "stationName": "Puttur",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "J V Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-AB-2025-1": {
+    "assetCode": "PARKING-AB-2025-1",
+    "stationCode": "AB",
+    "stationName": "Ambur Site 1",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "MK Traders",
+    "category": "PARKING"
+  },
+  "PARKING-KOKG-2025-4": {
+    "assetCode": "PARKING-KOKG-2025-4",
+    "stationCode": "KOKG",
+    "stationName": "Korukkupet Good shed",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Binco Services LLP",
+    "category": "PARKING"
+  },
+  "PARKING-KPD-ML-2025-6": {
+    "assetCode": "PARKING-KPD-ML-2025-6",
+    "stationCode": "KPD",
+    "stationName": "katpadi ML",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Saisharath subbian & Co",
+    "category": "PARKING"
+  },
+  "PARKING-CJ-2025-7": {
+    "assetCode": "PARKING-CJ-2025-7",
+    "stationCode": "CJ",
+    "stationName": "Kanchipuram",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "MK Traders",
+    "category": "PARKING"
+  },
+  "PARKING-NBK-2025-8": {
+    "assetCode": "PARKING-NBK-2025-8",
+    "stationCode": "NBK",
+    "stationName": "Nungambakkam",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Dharini",
+    "category": "PARKING"
+  },
+  "PARKING-KTPM-2025-9": {
+    "assetCode": "PARKING-KTPM-2025-9",
+    "stationCode": "KTPM",
+    "stationName": "Kotturpuram",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Binco Services LLP",
+    "category": "PARKING"
+  },
+  "PARKING-VLCY-A-2025-12": {
+    "assetCode": "PARKING-VLCY-A-2025-12",
+    "stationCode": "VLCY",
+    "stationName": "Velachery Part A",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Shiv Solutions",
+    "category": "PARKING"
+  },
+  "PARKING-CGL-2-2025-14": {
+    "assetCode": "PARKING-CGL-2-2025-14",
+    "stationCode": "CGL",
+    "stationName": "Chengalpattu Site 2",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "I C S Logistics",
+    "category": "PARKING"
+  },
+  "PARKING-AJJ-B-2025-15": {
+    "assetCode": "PARKING-AJJ-B-2025-15",
+    "stationCode": "AJJ",
+    "stationName": "Arakkonam Site B",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Falcons Transport Services",
+    "category": "PARKING"
+  },
+  "PARKING-GYM-2025-16": {
+    "assetCode": "PARKING-GYM-2025-16",
+    "stationCode": "GYM",
+    "stationName": "Gudiyattam",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "K G S Construction",
+    "category": "PARKING"
+  },
+  "PARKING-TRMN-2-2025-18": {
+    "assetCode": "PARKING-TRMN-2-2025-18",
+    "stationCode": "TRMN",
+    "stationName": "Taramani site 2",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Maaran Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-GWYR-2-2025-20": {
+    "assetCode": "PARKING-GWYR-2-2025-20",
+    "stationCode": "GWYR",
+    "stationName": "Greenways Road",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Riya Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-MASS-2025-21": {
+    "assetCode": "PARKING-MASS-2025-21",
+    "stationCode": "MASS",
+    "stationName": "Chennai Central suburban",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Falcons Transport Services",
+    "category": "PARKING"
+  },
+  "PARKING-AJJ-MAIN-2025-22": {
+    "assetCode": "PARKING-AJJ-MAIN-2025-22",
+    "stationCode": "AJJ",
+    "stationName": "Arakkonam Main",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Smart Forwarders",
+    "category": "PARKING"
+  },
+  "MAS-PARKING-ABU-2025-23": {
+    "assetCode": "MAS-PARKING-ABU-2025-23",
+    "stationCode": "ABU",
+    "stationName": "Ambattur",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "M Raghu",
+    "category": "PARKING"
+  },
+  "PARKING-TBM-W-CAR-2025-24": {
+    "assetCode": "PARKING-TBM-W-CAR-2025-24",
+    "stationCode": "TBM",
+    "stationName": "Tambaram West",
+    "location": "Not Available",
+    "type": "4 Wheeler",
+    "licenseeName": "Sun Motor Parts",
+    "category": "PARKING"
+  },
+  "PARKING-GPD-2025-25": {
+    "assetCode": "PARKING-GPD-2025-25",
+    "stationCode": "GPD",
+    "stationName": "Gummidipundi",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "A kanchana",
+    "category": "PARKING"
+  },
+  "PARKING-NEC-2025-26": {
+    "assetCode": "PARKING-NEC-2025-26",
+    "stationCode": "NEC",
+    "stationName": "Nemilicherry",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Vasantham",
+    "category": "PARKING"
+  },
+  "PARKING-CGL-NEW-2025-27": {
+    "assetCode": "PARKING-CGL-NEW-2025-27",
+    "stationCode": "CGL",
+    "stationName": "Chengalpattu new site",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Wilson Prasad R",
+    "category": "PARKING"
+  },
+  "PARKING-PER-SOUTH-2025-28": {
+    "assetCode": "PARKING-PER-SOUTH-2025-28",
+    "stationCode": "PER",
+    "stationName": "Perambur South",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Maaran Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-AKM-2025-29": {
+    "assetCode": "PARKING-AKM-2025-29",
+    "stationCode": "AKM",
+    "stationName": "Arambakkam",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "V M Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-KPD-CAR-2025-32": {
+    "assetCode": "PARKING-KPD-CAR-2025-32",
+    "stationCode": "KPD",
+    "stationName": "katpadi car",
+    "location": "Not Available",
+    "type": "4 Wheeler",
+    "licenseeName": "Saisharath subbian & Co",
+    "category": "PARKING"
+  },
+  "PARKING-NYP-2025-33": {
+    "assetCode": "PARKING-NYP-2025-33",
+    "stationCode": "NYP",
+    "stationName": "Nayudupeta",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "SAILAJA PONNAGANTI SPSR",
+    "category": "PARKING"
+  },
+  "PARKING-MBM-2025-34": {
+    "assetCode": "PARKING-MBM-2025-34",
+    "stationCode": "MBM",
+    "stationName": "Mambalam",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Riya Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-MJR-MAIN-2025-36": {
+    "assetCode": "PARKING-MJR-MAIN-2025-36",
+    "stationCode": "MJR",
+    "stationName": "Minjur Main",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Bhathmavathy Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-TRL-MAIN-2025-37": {
+    "assetCode": "PARKING-TRL-MAIN-2025-37",
+    "stationCode": "TRL",
+    "stationName": "Tiruvallur Main",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Sai Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-PER-NOR-2025-38": {
+    "assetCode": "PARKING-PER-NOR-2025-38",
+    "stationCode": "PER",
+    "stationName": "Perambur North Side",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Sai Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-MBM-2025-40": {
+    "assetCode": "PARKING-MBM-2025-40",
+    "stationCode": "MBM",
+    "stationName": "Mambalam",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Maaran Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-GDY-2025-42": {
+    "assetCode": "PARKING-GDY-2025-42",
+    "stationCode": "GDY",
+    "stationName": "Guindy",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Thavamani Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-KOK-2025-43": {
+    "assetCode": "PARKING-KOK-2025-43",
+    "stationCode": "KOK",
+    "stationName": "Korukkupet",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Binu Railway Contract",
+    "category": "PARKING"
+  },
+  "PARKING-STM-EAST-2025-45": {
+    "assetCode": "PARKING-STM-EAST-2025-45",
+    "stationCode": "STM",
+    "stationName": "St. Thomas Mount east",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Saisharath subbian & Co",
+    "category": "PARKING"
+  },
+  "PARKING-BBQ-2025-46": {
+    "assetCode": "PARKING-BBQ-2025-46",
+    "stationCode": "BBQ",
+    "stationName": "Basin Bridge Jn.",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Saisharath subbian & Co",
+    "category": "PARKING"
+  },
+  "PARKING-ENR-2025-47": {
+    "assetCode": "PARKING-ENR-2025-47",
+    "stationCode": "ENR",
+    "stationName": "Ennore",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Vijayalakshmi",
+    "category": "PARKING"
+  },
+  "PARKING-SPWEST-2025-49": {
+    "assetCode": "PARKING-SPWEST-2025-49",
+    "stationCode": "SP",
+    "stationName": "Saidapet West",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Falcons Transport Services",
+    "category": "PARKING"
+  },
+  "PARKING-POTI-2025-50": {
+    "assetCode": "PARKING-POTI-2025-50",
+    "stationCode": "POTI",
+    "stationName": "Potheri",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "J V Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-SPE-2025-51": {
+    "assetCode": "PARKING-SPE-2025-51",
+    "stationCode": "SPE",
+    "stationName": "Sullurpet",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Praveen Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-SP-EAST-2025-52": {
+    "assetCode": "PARKING-SP-EAST-2025-52",
+    "stationCode": "SP",
+    "stationName": "Saidapet East",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "M.Harikrishnan",
+    "category": "PARKING"
+  },
+  "PARKING-PON-MAIN-2025-53": {
+    "assetCode": "PARKING-PON-MAIN-2025-53",
+    "stationCode": "PON",
+    "stationName": "Ponneri Main",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Praveen Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-WJ-2025-54": {
+    "assetCode": "PARKING-WJ-2025-54",
+    "stationCode": "WJ",
+    "stationName": "Walajabad",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Binu Railway Contract",
+    "category": "PARKING"
+  },
+  "PARKING-MSC-2025-56": {
+    "assetCode": "PARKING-MSC-2025-56",
+    "stationCode": "MSC",
+    "stationName": "Chetpet",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Ever Green Homes",
+    "category": "PARKING"
+  },
+  "PARKING-JTJ-2025-57": {
+    "assetCode": "PARKING-JTJ-2025-57",
+    "stationCode": "JTJ",
+    "stationName": "Jolarpet",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Riya Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-INDR-2025-58": {
+    "assetCode": "PARKING-INDR-2025-58",
+    "stationCode": "INDR",
+    "stationName": "Indira Nagar",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Surya Brothers",
+    "category": "PARKING"
+  },
+  "PARKING-AVD-2025-61": {
+    "assetCode": "PARKING-AVD-2025-61",
+    "stationCode": "AVD",
+    "stationName": "Avadi",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Sagayam Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-VLCY-MED-2025-62": {
+    "assetCode": "PARKING-VLCY-MED-2025-62",
+    "stationCode": "VLCY",
+    "stationName": "Velachery Medavakkam side",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Gariba Nawaz Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-TVM-2025-63": {
+    "assetCode": "PARKING-TVM-2025-63",
+    "stationCode": "TMV",
+    "stationName": "Tindivanam",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Nagamoorthi S",
+    "category": "PARKING"
+  },
+  "PARKING-MJR-II-2025-64": {
+    "assetCode": "PARKING-MJR-II-2025-64",
+    "stationCode": "MJR",
+    "stationName": "Minjur II Entry",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Sagayam Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-CJ-2025-68": {
+    "assetCode": "PARKING-CJ-2025-68",
+    "stationCode": "AVD",
+    "stationName": "Avadi South",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Apex associates",
+    "category": "PARKING"
+  },
+  "PARKING-AIP-2025-66": {
+    "assetCode": "PARKING-AIP-2025-66",
+    "stationCode": "AIP",
+    "stationName": "Attipattu",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Vijayalakshmi",
+    "category": "PARKING"
+  },
+  "PARKING-SVR-2025-67": {
+    "assetCode": "PARKING-SVR-2025-67",
+    "stationCode": "SVR",
+    "stationName": "Sevvapet Road",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Apex associates",
+    "category": "PARKING"
+  },
+  "PARKING-AVD-SOU-2025-65": {
+    "assetCode": "PARKING-AVD-SOU-2025-65",
+    "stationCode": "CJ",
+    "stationName": "Kanchipuram",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Apex associates",
+    "category": "PARKING"
+  },
+  "PARKING-AJJ-C-2025-70": {
+    "assetCode": "PARKING-AJJ-C-2025-70",
+    "stationCode": "AJJ",
+    "stationName": "Arakkonam Site C",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Maaran Enterprises",
+    "category": "PARKING"
+  },
+  "PARKING-TBM-E-PR-2025-71": {
+    "assetCode": "PARKING-TBM-E-PR-2025-71",
+    "stationCode": "TBM",
+    "stationName": "Tambaram East Premium",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Sun Motor Parts",
+    "category": "PARKING"
+  },
+  "PARKING-CGL-ML-2025-72": {
+    "assetCode": "PARKING-CGL-ML-2025-72",
+    "stationCode": "CGL",
+    "stationName": "Chengalpattu multilevel",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Subburaj. R",
+    "category": "PARKING"
+  },
+  "PARKING-CJE-2025-73": {
+    "assetCode": "PARKING-CJE-2025-73",
+    "stationCode": "CJE",
+    "stationName": "Kanchipuram East",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Panjali Traders",
+    "category": "PARKING"
+  },
+  "PARKING-MCPK-2025-74": {
+    "assetCode": "PARKING-MCPK-2025-74",
+    "stationCode": "MCPK",
+    "stationName": "Chepauk (A & B)",
+    "location": "Not Available",
+    "type": "Mixed",
+    "licenseeName": "Vijayalakshmi",
+    "category": "PARKING"
+  },
+  "PARKING-TMVL-2025-75": {
+    "assetCode": "PARKING-TMVL-2025-75",
+    "stationCode": "TMVL",
+    "stationName": "Tirumullaivoil",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "M Raghu",
+    "category": "PARKING"
+  },
+  "PARKING-TBMS-CAR-2025-76": {
+    "assetCode": "PARKING-TBMS-CAR-2025-76",
+    "stationCode": "TBMS",
+    "stationName": "Tambaram Sanatorium",
+    "location": "Not Available",
+    "type": "4 Wheeler",
+    "licenseeName": "Sun Motor Parts",
+    "category": "PARKING"
+  },
+  "PARKING-TADA-2025-77": {
+    "assetCode": "PARKING-TADA-2025-77",
+    "stationCode": "TADA",
+    "stationName": "TADA",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "P L TRADERS-ANANTHAPURAM",
+    "category": "PARKING"
+  },
+  "PARKING-TYMR-2024-63": {
+    "assetCode": "PARKING-TYMR-2024-63",
+    "stationCode": "TYMR",
+    "stationName": "Tiruvanmiyur",
+    "location": "Not Available",
+    "type": "2 wheeler",
+    "licenseeName": "Vijayalakshmi",
+    "category": "PARKING"
+  },
+  "GMU-04": {
+    "assetCode": "GMU-04",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Concourse",
+    "type": "GMU",
+    "licenseeName": "NISHA PANDEY",
+    "category": "CATERING"
+  },
+  "GMU-05": {
+    "assetCode": "GMU-05",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "6/7",
+    "type": "GMU",
+    "licenseeName": "GREEN STAR CATERS",
+    "category": "CATERING"
+  },
+  "GMU-10": {
+    "assetCode": "GMU-10",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Concourse",
+    "type": "GMU",
+    "licenseeName": "AMBER FOODS",
+    "category": "CATERING"
+  },
+  "GMU-13": {
+    "assetCode": "GMU-13",
+    "stationCode": "KOTR",
+    "stationName": "Not Available",
+    "location": "1",
+    "type": "GMU",
+    "licenseeName": "BALAJI CATERING SERVICE",
+    "category": "CATERING"
+  },
+  "GMU-24": {
+    "assetCode": "GMU-24",
+    "stationCode": "KPD",
+    "stationName": "Not Available",
+    "location": "4/5",
+    "type": "GMU",
+    "licenseeName": "SHINE CATERS",
+    "category": "CATERING"
+  },
+  "GMU-25": {
+    "assetCode": "GMU-25",
+    "stationCode": "KPD",
+    "stationName": "Not Available",
+    "location": "4/5",
+    "type": "GMU",
+    "licenseeName": "P PRABHU",
+    "category": "CATERING"
+  },
+  "GMU-26": {
+    "assetCode": "GMU-26",
+    "stationCode": "KPD",
+    "stationName": "Not Available",
+    "location": "2/3",
+    "type": "GMU",
+    "licenseeName": "AJS CATERERS",
+    "category": "CATERING"
+  },
+  "GMU-27": {
+    "assetCode": "GMU-27",
+    "stationCode": "KPD",
+    "stationName": "Not Available",
+    "location": "1",
+    "type": "GMU",
+    "licenseeName": "A R CATERS",
+    "category": "CATERING"
+  },
+  "GMU-28": {
+    "assetCode": "GMU-28",
+    "stationCode": "KPD",
+    "stationName": "Not Available",
+    "location": "2/3",
+    "type": "GMU",
+    "licenseeName": "SAMREEN AHMAD CATERING SERVICES",
+    "category": "CATERING"
+  },
+  "GMU-29": {
+    "assetCode": "GMU-29",
+    "stationCode": "KPD",
+    "stationName": "Not Available",
+    "location": "1",
+    "type": "GMU",
+    "licenseeName": "DINESH SINGH TOMAR CATERING SERVICE",
+    "category": "CATERING"
+  },
+  "GMU-31": {
+    "assetCode": "GMU-31",
+    "stationCode": "AJJ",
+    "stationName": "Not Available",
+    "location": "2/3",
+    "type": "GMU",
+    "licenseeName": "SOPAN RESTAURANT",
+    "category": "CATERING"
+  },
+  "GMU-33": {
+    "assetCode": "GMU-33",
+    "stationCode": "MSB",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "GMU",
+    "licenseeName": "KAY VEE’S BAKES N DRINKS",
+    "category": "CATERING"
+  },
+  "GMU-36": {
+    "assetCode": "GMU-36",
+    "stationCode": "MSF",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "GMU",
+    "licenseeName": "KAY VEE’S BAKES N DRINKS",
+    "category": "CATERING"
+  },
+  "GMU-37": {
+    "assetCode": "GMU-37",
+    "stationCode": "MPK",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "GMU",
+    "licenseeName": "SEEMA PANDEY",
+    "category": "CATERING"
+  },
+  "GMU-38": {
+    "assetCode": "GMU-38",
+    "stationCode": "MPK",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "GMU",
+    "licenseeName": "SEEMA PANDEY",
+    "category": "CATERING"
+  },
+  "GMU-46": {
+    "assetCode": "GMU-46",
+    "stationCode": "MS",
+    "stationName": "Not Available",
+    "location": "3/4",
+    "type": "GMU",
+    "licenseeName": "SOPAN RESTAURANT",
+    "category": "CATERING"
+  },
+  "GMU-48": {
+    "assetCode": "GMU-48",
+    "stationCode": "NBK",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "GMU",
+    "licenseeName": "J AAJAR BANEESH",
+    "category": "CATERING"
+  },
+  "GMU-51": {
+    "assetCode": "GMU-51",
+    "stationCode": "MBM",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "GMU",
+    "licenseeName": "SOPAN RESTAURANT",
+    "category": "CATERING"
+  },
+  "GMU-52": {
+    "assetCode": "GMU-52",
+    "stationCode": "MBM",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "GMU",
+    "licenseeName": "SHIV & SONS",
+    "category": "CATERING"
+  },
+  "GMU-60": {
+    "assetCode": "GMU-60",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "7/8",
+    "type": "GMU",
+    "licenseeName": "G BHARATHI",
+    "category": "CATERING"
+  },
+  "GMU-63": {
+    "assetCode": "GMU-63",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "3/4",
+    "type": "GMU",
+    "licenseeName": "SEEMA PANDEY",
+    "category": "CATERING"
+  },
+  "GMU-73": {
+    "assetCode": "GMU-73",
+    "stationCode": "MASS",
+    "stationName": "Chennai Central suburban",
+    "location": "15/16",
+    "type": "GMU",
+    "licenseeName": "GREEN STAR CATERS",
+    "category": "CATERING"
+  },
+  "GMU-77": {
+    "assetCode": "GMU-77",
+    "stationCode": "MJR",
+    "stationName": "Not Available",
+    "location": "2/3",
+    "type": "GMU",
+    "licenseeName": "GREEN STAR CATERS",
+    "category": "CATERING"
+  },
+  "GMU-101": {
+    "assetCode": "GMU-101",
+    "stationCode": "JTJ",
+    "stationName": "Not Available",
+    "location": "1",
+    "type": "GMU",
+    "licenseeName": "NITHYA AAVIN STALL",
+    "category": "CATERING"
+  },
+  "SMU-08": {
+    "assetCode": "SMU-08",
+    "stationCode": "BBQ",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "SMU",
+    "licenseeName": "J AAJAR BANESH",
+    "category": "CATERING"
+  },
+  "SMU-16": {
+    "assetCode": "SMU-16",
+    "stationCode": "MS",
+    "stationName": "Not Available",
+    "location": "5/6",
+    "type": "SMU",
+    "licenseeName": "THIRUVENI CATERING SERVICE",
+    "category": "CATERING"
+  },
+  "SMU-22": {
+    "assetCode": "SMU-22",
+    "stationCode": "CMP",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "SMU",
+    "licenseeName": "K SENTHIL KUMAR",
+    "category": "CATERING"
+  },
+  "SMU-24": {
+    "assetCode": "SMU-24",
+    "stationCode": "CGL",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "SMU",
+    "licenseeName": "THIRUVENI CATERING SERVICE",
+    "category": "CATERING"
+  },
+  "SMU-25": {
+    "assetCode": "SMU-25",
+    "stationCode": "CGL",
+    "stationName": "Not Available",
+    "location": "5/6",
+    "type": "SMU",
+    "licenseeName": "SAMREEN AHMAD CATERING SERVICES",
+    "category": "CATERING"
+  },
+  "SMU-26": {
+    "assetCode": "SMU-26",
+    "stationCode": "CGL",
+    "stationName": "Not Available",
+    "location": "1",
+    "type": "SMU",
+    "licenseeName": "Lakshmi Mess",
+    "category": "CATERING"
+  },
+  "SMU-29": {
+    "assetCode": "SMU-29",
+    "stationCode": "TMV",
+    "stationName": "Not Available",
+    "location": "Concourse",
+    "type": "SMU-DEF",
+    "licenseeName": "SK OUTDOOR CATERING SERVICES",
+    "category": "CATERING"
+  },
+  "MPPS-01": {
+    "assetCode": "MPPS-01",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Concourse",
+    "type": "MPS",
+    "licenseeName": "M JESINA",
+    "category": "CATERING"
+  },
+  "MPPS-04": {
+    "assetCode": "MPPS-04",
+    "stationCode": "AJJ",
+    "stationName": "Not Available",
+    "location": "4/5",
+    "type": "MPS",
+    "licenseeName": "J AAJAR BANEESH",
+    "category": "CATERING"
+  },
+  "MPPS-06": {
+    "assetCode": "MPPS-06",
+    "stationCode": "KPD",
+    "stationName": "Not Available",
+    "location": "1",
+    "type": "MPS",
+    "licenseeName": "AR CATERS",
+    "category": "CATERING"
+  },
+  "MPPS-07": {
+    "assetCode": "MPPS-07",
+    "stationCode": "KPD",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "MPS",
+    "licenseeName": "SAMREEN AHMAD CATERING SERVICES",
+    "category": "CATERING"
+  },
+  "MPPS-08": {
+    "assetCode": "MPPS-08",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "5/6",
+    "type": "MPS",
+    "licenseeName": "P N RAMEES ALI",
+    "category": "CATERING"
+  },
+  "MPPS-09": {
+    "assetCode": "MPPS-09",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "7/8",
+    "type": "MPS",
+    "licenseeName": "THIRUVENI CATERING SERVICE",
+    "category": "CATERING"
+  },
+  "MPPS-10": {
+    "assetCode": "MPPS-10",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "2/3",
+    "type": "MPS",
+    "licenseeName": "SAMREEN AHMAD CATERING SERVICES",
+    "category": "CATERING"
+  },
+  "MPPS-11": {
+    "assetCode": "MPPS-11",
+    "stationCode": "AB",
+    "stationName": "Not Available",
+    "location": "1",
+    "type": "MPS",
+    "licenseeName": "AR CATERS",
+    "category": "CATERING"
+  },
+  "MPPS-13": {
+    "assetCode": "MPPS-13",
+    "stationCode": "PER",
+    "stationName": "Not Available",
+    "location": "4/5",
+    "type": "MPS",
+    "licenseeName": "GREEN STAR RESIDENCY",
+    "category": "CATERING"
+  },
+  "MPPS-14": {
+    "assetCode": "MPPS-14",
+    "stationCode": "TRL",
+    "stationName": "Not Available",
+    "location": "2/3",
+    "type": "MPS",
+    "licenseeName": "GREEN STAR CATERS",
+    "category": "CATERING"
+  },
+  "MPPS-15": {
+    "assetCode": "MPPS-15",
+    "stationCode": "TRT",
+    "stationName": "Not Available",
+    "location": "1",
+    "type": "MPS",
+    "licenseeName": "THIRUVENI CATERING SERVICE",
+    "category": "CATERING"
+  },
+  "MPPS-17": {
+    "assetCode": "MPPS-17",
+    "stationCode": "BBQ",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "MPS",
+    "licenseeName": "K SENTHIL KUMAR",
+    "category": "CATERING"
+  },
+  "MPPS-40": {
+    "assetCode": "MPPS-40",
+    "stationCode": "VLK",
+    "stationName": "Not Available",
+    "location": "2/3",
+    "type": "MPS",
+    "licenseeName": "KY ENTERPRISES",
+    "category": "CATERING"
+  },
+  "MPPS-059": {
+    "assetCode": "MPPS-059",
+    "stationCode": "SPE",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "MPS-DEF",
+    "licenseeName": "PRAVEEN ENTERPRISES",
+    "category": "CATERING"
+  },
+  "MPPS-062": {
+    "assetCode": "MPPS-062",
+    "stationCode": "POTI",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "MPS-DEF",
+    "licenseeName": "CFVLR STALL",
+    "category": "CATERING"
+  },
+  "MMPS-02": {
+    "assetCode": "MMPS-02",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "8/9",
+    "type": "Milk Stall",
+    "licenseeName": "CR CATERING CO-MALDA",
+    "category": "CATERING"
+  },
+  "MMPS-03": {
+    "assetCode": "MMPS-03",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "1/2",
+    "type": "Milk Stall",
+    "licenseeName": "CR CATERING CO-MALDA",
+    "category": "CATERING"
+  },
+  "MMPS-05": {
+    "assetCode": "MMPS-05",
+    "stationCode": "MPK",
+    "stationName": "Not Available",
+    "location": "4",
+    "type": "Milk Stall",
+    "licenseeName": "KOTA RADHIKA",
+    "category": "CATERING"
+  },
+  "MMPS-08": {
+    "assetCode": "MMPS-08",
+    "stationCode": "PER",
+    "stationName": "Not Available",
+    "location": "Concourse",
+    "type": "Milk Stall",
+    "licenseeName": "SNP DAIRY MILK",
+    "category": "CATERING"
+  },
+  "MMPS-10": {
+    "assetCode": "MMPS-10",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Concourse",
+    "type": "Milk Stall",
+    "licenseeName": "KOTA RADHIKA",
+    "category": "CATERING"
+  },
+  "MMPS-11": {
+    "assetCode": "MMPS-11",
+    "stationCode": "MASS",
+    "stationName": "Chennai Central suburban",
+    "location": "1/2",
+    "type": "Milk Stall",
+    "licenseeName": "KOTA RADHIKA",
+    "category": "CATERING"
+  },
+  "MMPS-15": {
+    "assetCode": "MMPS-15",
+    "stationCode": "TRL",
+    "stationName": "Not Available",
+    "location": "2/3",
+    "type": "Milk Stall",
+    "licenseeName": "KOTA RADHIKA",
+    "category": "CATERING"
+  },
+  "MMPS-17": {
+    "assetCode": "MMPS-17",
+    "stationCode": "KPD",
+    "stationName": "Not Available",
+    "location": "2/3",
+    "type": "Milk Stall",
+    "licenseeName": "CR CATERING CO-MALDA",
+    "category": "CATERING"
+  },
+  "MMPS-21": {
+    "assetCode": "MMPS-21",
+    "stationCode": "AVD",
+    "stationName": "Not Available",
+    "location": "2",
+    "type": "Milk Stall",
+    "licenseeName": "SNP DAIRY MILK",
+    "category": "CATERING"
+  },
+  "MMPS-22": {
+    "assetCode": "MMPS-22",
+    "stationCode": "CGL",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "Milk Stall",
+    "licenseeName": "SNP DAIRY MILK",
+    "category": "CATERING"
+  },
+  "MMPS-27": {
+    "assetCode": "MMPS-27",
+    "stationCode": "UPM",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "Milk Stall",
+    "licenseeName": "CR CATERING CO-MALDA",
+    "category": "CATERING"
+  },
+  "FJS-11": {
+    "assetCode": "FJS-11",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "1/2",
+    "type": "Juice Stall",
+    "licenseeName": "PES CATERS",
+    "category": "CATERING"
+  },
+  "MC37-PER-22": {
+    "assetCode": "MC37-PER-22",
+    "stationCode": "PER",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "SUN AND CO-TIRUVALLUR",
+    "category": "NFR"
+  },
+  "MC-37-BBQ-22": {
+    "assetCode": "MC-37-BBQ-22",
+    "stationCode": "BBQ",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "SUN AND CO-TIRUVALLUR",
+    "category": "NFR"
+  },
+  "MC37-VJM-22": {
+    "assetCode": "MC37-VJM-22",
+    "stationCode": "VJM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "SUN AND CO-TIRUVALLUR",
+    "category": "NFR"
+  },
+  "MC37-OOH-CGL-22": {
+    "assetCode": "MC37-OOH-CGL-22",
+    "stationCode": "CGL",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "SUN AND CO-TIRUVALLUR",
+    "category": "NFR"
+  },
+  "MC37-OOH-PADI-22": {
+    "assetCode": "MC37-OOH-PADI-22",
+    "stationCode": "PADI",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "SUN AND CO-TIRUVALLUR",
+    "category": "NFR"
+  },
+  "MC37OOHVLCY23": {
+    "assetCode": "MC37OOHVLCY23",
+    "stationCode": "VLCY",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "TRIAD-CHENNAI",
+    "category": "NFR"
+  },
+  "MC-37-OOH-MAS-1-23": {
+    "assetCode": "MC-37-OOH-MAS-1-23",
+    "stationCode": "MASS",
+    "stationName": "Chennai Central suburban",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "SUN AND CO-TIRUVALLUR",
+    "category": "NFR"
+  },
+  "MC-37-ADVT-VLK": {
+    "assetCode": "MC-37-ADVT-VLK",
+    "stationCode": "VLK",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "FUTURE ADS-CHENNAI",
+    "category": "NFR"
+  },
+  "MC-37-MAS-RDN-23": {
+    "assetCode": "MC-37-MAS-RDN-23",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "SRISHTI COMMUNICATIONS-BANGALROE",
+    "category": "NFR"
+  },
+  "MC-37-KOTR-23": {
+    "assetCode": "MC-37-KOTR-23",
+    "stationCode": "KOTR",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "FUTURE ADS-CHENNAI",
+    "category": "NFR"
+  },
+  "MC-37-OOH-MPKT-23": {
+    "assetCode": "MC-37-OOH-MPKT-23",
+    "stationCode": "MPKT",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "TRIAD-CHENNAI",
+    "category": "NFR"
+  },
+  "MC-37-OOH-AJJ-23": {
+    "assetCode": "MC-37-OOH-AJJ-23",
+    "stationCode": "AJJ",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "FUTURE ADS-CHENNAI",
+    "category": "NFR"
+  },
+  "MC-37-OOH-TRT-23": {
+    "assetCode": "MC-37-OOH-TRT-23",
+    "stationCode": "TRT",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "FUTURE ADS-CHENNAI",
+    "category": "NFR"
+  },
+  "AB-OH-200-23-1": {
+    "assetCode": "AB-OH-200-23-1",
+    "stationCode": "AB",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "SPEED ADS COMMUNICATIONS-VELLORE",
+    "category": "NFR"
+  },
+  "TRL-OSN-199-23-1": {
+    "assetCode": "TRL-OSN-199-23-1",
+    "stationCode": "TRL",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "ASVEEN ADS-CHENNAI",
+    "category": "NFR"
+  },
+  "EFF-130638-23-1": {
+    "assetCode": "EFF-130638-23-1",
+    "stationCode": "Guruvayoor Express",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "StudioK Rate",
+    "category": "NFR"
+  },
+  "ADVT-MAS-TBM-OSD-244-23-1": {
+    "assetCode": "ADVT-MAS-TBM-OSD-244-23-1",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "ASVEEN ADS-CHENNAI",
+    "category": "NFR"
+  },
+  "PUB-MASS-RDN-24-1": {
+    "assetCode": "PUB-MASS-RDN-24-1",
+    "stationCode": "MASS",
+    "stationName": "Chennai Central suburban",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Armour Display System Pvt.Ltd.",
+    "category": "NFR"
+  },
+  "PUB-CGL-PMBJK-24-3": {
+    "assetCode": "PUB-CGL-PMBJK-24-3",
+    "stationCode": "CGL",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "S.Jayalakshmi",
+    "category": "NFR"
+  },
+  "PUB-MAS-WH-CGL-24-5": {
+    "assetCode": "PUB-MAS-WH-CGL-24-5",
+    "stationCode": "CGL",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "J.K.Associates",
+    "category": "NFR"
+  },
+  "PUB-MAS-OOH-MAS-24-6": {
+    "assetCode": "PUB-MAS-OOH-MAS-24-6",
+    "stationCode": "MAS (Garden Area & Bus Bay)",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "M/s.Future Ads",
+    "category": "NFR"
+  },
+  "MAS-OOH-MSCZONE-2024": {
+    "assetCode": "MAS-OOH-MSCZONE-2024",
+    "stationCode": "MSC Zone",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "M/s.Asveen Ads",
+    "category": "NFR"
+  },
+  "MS-TWnOPS-63-23-1": {
+    "assetCode": "MS-TWnOPS-63-23-1",
+    "stationCode": "MS",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "VEL RAIL CARGO-MADURAI",
+    "category": "NFR"
+  },
+  "BSS-MASS-2024-2": {
+    "assetCode": "BSS-MASS-2024-2",
+    "stationCode": "MASS",
+    "stationName": "Chennai Central suburban",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sun Mobility Private Ltd",
+    "category": "NFR"
+  },
+  "BSS-MS-2024-1": {
+    "assetCode": "BSS-MS-2024-1",
+    "stationCode": "MS",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sun Mobility Private Ltd",
+    "category": "NFR"
+  },
+  "MAS-RLXC-LOC2-24": {
+    "assetCode": "MAS-RLXC-LOC2-24",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Uma",
+    "category": "NFR"
+  },
+  "TBM-PFADVT-OSD-24-258": {
+    "assetCode": "TBM-PFADVT-OSD-24-258",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Naveen Advertisers",
+    "category": "NFR"
+  },
+  "MAS-MOBILESHOP-2024-1": {
+    "assetCode": "MAS-MOBILESHOP-2024-1",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Karthik Food World",
+    "category": "NFR"
+  },
+  "MAS-ANNR-BS-81-24": {
+    "assetCode": "MAS-ANNR-BS-81-24",
+    "stationCode": "ANNR",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sun Mobility Private Ltd",
+    "category": "NFR"
+  },
+  "MLCP-GDY-2024-1": {
+    "assetCode": "MLCP-GDY-2024-1",
+    "stationCode": "GDY",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Falcon solutions",
+    "category": "NFR"
+  },
+  "RLXC-TBM-2024-4": {
+    "assetCode": "RLXC-TBM-2024-4",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "saisharath subbian and co-coimbatore",
+    "category": "NFR"
+  },
+  "BSS-MTMY-2024-4": {
+    "assetCode": "BSS-MTMY-2024-4",
+    "stationCode": "MTMY",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sun Mobility Private Ltd",
+    "category": "NFR"
+  },
+  "MAS-Txtstore-2025-1": {
+    "assetCode": "MAS-Txtstore-2025-1",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Vennila clothing company-TIRUPUR",
+    "category": "NFR"
+  },
+  "PUB-MAS-Glowball-25-1": {
+    "assetCode": "PUB-MAS-Glowball-25-1",
+    "stationCode": "MASS",
+    "stationName": "Chennai Central suburban",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "AKS Express",
+    "category": "NFR"
+  },
+  "PUB-MAS-OOH-MSB-2025": {
+    "assetCode": "PUB-MAS-OOH-MSB-2025",
+    "stationCode": "MSB Zone",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Signa OOH",
+    "category": "NFR"
+  },
+  "BSS-KTPM-2025-5": {
+    "assetCode": "BSS-KTPM-2025-5",
+    "stationCode": "KTPM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sun Mobility Private Ltd",
+    "category": "NFR"
+  },
+  "BSS-TYMR-2025-6": {
+    "assetCode": "BSS-TYMR-2025-6",
+    "stationCode": "TYMR",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sun Mobility Private Ltd",
+    "category": "NFR"
+  },
+  "PUB-OOH-TBM-2025-3": {
+    "assetCode": "PUB-OOH-TBM-2025-3",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "TRIAD-CHENNAI",
+    "category": "NFR"
+  },
+  "PUB-EMU-TBM-20-2025-2": {
+    "assetCode": "PUB-EMU-TBM-20-2025-2",
+    "stationCode": "EMU-TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Mannur whitefield creators private limited",
+    "category": "NFR"
+  },
+  "PUB-EMU-VLCY-6-2025-1": {
+    "assetCode": "PUB-EMU-VLCY-6-2025-1",
+    "stationCode": "EMU-VLCY",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Mannur whitefield creators private limited",
+    "category": "NFR"
+  },
+  "PUB-BSS-MCPT-10": {
+    "assetCode": "PUB-BSS-MCPT-10",
+    "stationCode": "MCPT",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sun Mobility Private Ltd",
+    "category": "NFR"
+  },
+  "PUB-BSS-SP-08": {
+    "assetCode": "PUB-BSS-SP-08",
+    "stationCode": "SP",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sun Mobility Private Ltd",
+    "category": "NFR"
+  },
+  "MAS-BSS-TRMN-07": {
+    "assetCode": "MAS-BSS-TRMN-07",
+    "stationCode": "TRMN",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sun Mobility Private Ltd",
+    "category": "NFR"
+  },
+  "PUB-BSS-VLCY-09": {
+    "assetCode": "PUB-BSS-VLCY-09",
+    "stationCode": "VLCY",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sun Mobility Private Ltd",
+    "category": "NFR"
+  },
+  "PUB-BSS-MKK-11": {
+    "assetCode": "PUB-BSS-MKK-11",
+    "stationCode": "MKK",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sun Mobility Private Ltd",
+    "category": "NFR"
+  },
+  "PUB-OSN-PVM-PTLR-25-2": {
+    "assetCode": "PUB-OSN-PVM-PTLR-25-2",
+    "stationCode": "PVM-PTLR",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Naveen advertisers",
+    "category": "NFR"
+  },
+  "MAS-PUB-WH-TBM-2025-1": {
+    "assetCode": "MAS-PUB-WH-TBM-2025-1",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Ads Kraft",
+    "category": "NFR"
+  },
+  "PUB-MAS-RDN-2025-3": {
+    "assetCode": "PUB-MAS-RDN-2025-3",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Srishti Communications",
+    "category": "NFR"
+  },
+  "PUB-MAS-OSD-MASS-25": {
+    "assetCode": "PUB-MAS-OSD-MASS-25",
+    "stationCode": "MASS",
+    "stationName": "Chennai Central suburban",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Podhigai ads PRIVATE LIMITED-CHENNAI",
+    "category": "NFR"
+  },
+  "PUB-OSN-PRGL-PWU-2025-3": {
+    "assetCode": "PUB-OSN-PRGL-PWU-2025-3",
+    "stationCode": "PRGL-PWU",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Tesova Media",
+    "category": "NFR"
+  },
+  "PUB-MAS-OOH-MS-2025-3": {
+    "assetCode": "PUB-MAS-OOH-MS-2025-3",
+    "stationCode": "MS",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "ASVEEN ADS-CHENNAI",
+    "category": "NFR"
+  },
+  "PUB-MAS-Attarshop-03": {
+    "assetCode": "PUB-MAS-Attarshop-03",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "AKS Express",
+    "category": "NFR"
+  },
+  "PUB-MAS-Leathershop-02": {
+    "assetCode": "PUB-MAS-Leathershop-02",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Saisharath Subbian and co-Coimbatore",
+    "category": "NFR"
+  },
+  "PUB-MAS-Opticalshop-01": {
+    "assetCode": "PUB-MAS-Opticalshop-01",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Smart Forwarders",
+    "category": "NFR"
+  },
+  "MAS-SG-COSMETICSSHOP-04": {
+    "assetCode": "MAS-SG-COSMETICSSHOP-04",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Jithu Entire Solutions",
+    "category": "NFR"
+  },
+  "MAS-SG-STATIONARY-05": {
+    "assetCode": "MAS-SG-STATIONARY-05",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Jithu Entire Solutions",
+    "category": "NFR"
+  },
+  "RDN-MS-25": {
+    "assetCode": "RDN-MS-25",
+    "stationCode": "MS",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Naveen Advertisers",
+    "category": "NFR"
+  },
+  "PUB-OOH-MRTS-2025": {
+    "assetCode": "PUB-OOH-MRTS-2025",
+    "stationCode": "MRTS ROB-RUB",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "PODHIGAI ADS PRIVATE LIMITED-CHENNAI",
+    "category": "NFR"
+  },
+  "NFR-BSS-PRGD-12": {
+    "assetCode": "NFR-BSS-PRGD-12",
+    "stationCode": "PRGD",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Indofast swap Energy Pvt Ltd",
+    "category": "NFR"
+  },
+  "PRGL-MOBSTORE-25-7": {
+    "assetCode": "PRGL-MOBSTORE-25-7",
+    "stationCode": "PRGL",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Jithu Entire Solutions",
+    "category": "NFR"
+  },
+  "VLK-MOBSTORE-25-8": {
+    "assetCode": "VLK-MOBSTORE-25-8",
+    "stationCode": "VLK",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Jithu Entire Solutions",
+    "category": "NFR"
+  },
+  "PUB-OSN-KPD-25": {
+    "assetCode": "PUB-OSN-KPD-25",
+    "stationCode": "KPD",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "AC communications",
+    "category": "NFR"
+  },
+  "MAS-Txtstore-2025-2": {
+    "assetCode": "MAS-Txtstore-2025-2",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Vennila clothing company",
+    "category": "NFR"
+  },
+  "NFR-BSS-MKAK-13": {
+    "assetCode": "NFR-BSS-MKAK-13",
+    "stationCode": "MKAK",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Indofast swap Energy Pvt Ltd",
+    "category": "NFR"
+  },
+  "MAS-PUb-CBE-Shatabdi-2025": {
+    "assetCode": "MAS-PUb-CBE-Shatabdi-2025",
+    "stationCode": "CBE Shatabdi Express",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Prime Marketing",
+    "category": "NFR"
+  },
+  "NFR-SHOPS-KOTR-2025-1": {
+    "assetCode": "NFR-SHOPS-KOTR-2025-1",
+    "stationCode": "KOTR",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Smiley Enterprises",
+    "category": "NFR"
+  },
+  "NFR-SHOPS-AVD-2025-2": {
+    "assetCode": "NFR-SHOPS-AVD-2025-2",
+    "stationCode": "AVD",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Smiley Enterprises",
+    "category": "NFR"
+  },
+  "NFR-VLCY-outdoorsports-1": {
+    "assetCode": "NFR-VLCY-outdoorsports-1",
+    "stationCode": "VLCY",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Maaran Enterprises",
+    "category": "NFR"
+  },
+  "PUB-MAS-RC-24-2": {
+    "assetCode": "PUB-MAS-RC-24-2",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "R.Subburaj",
+    "category": "NFR"
+  },
+  "NFR-VLCY-INDOOR-25": {
+    "assetCode": "NFR-VLCY-INDOOR-25",
+    "stationCode": "VLCY",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Prashik Trends",
+    "category": "NFR"
+  },
+  "NFR-PRGL-Groceryshop-01": {
+    "assetCode": "NFR-PRGL-Groceryshop-01",
+    "stationCode": "PRGL",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "NFR-GPD-outdoor-02": {
+    "assetCode": "NFR-GPD-outdoor-02",
+    "stationCode": "GPD",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Ultra Technical Engineering",
+    "category": "NFR"
+  },
+  "NFR-TBM-Cosmeticsshop-02": {
+    "assetCode": "NFR-TBM-Cosmeticsshop-02",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "NFR-MAS-BVM-02": {
+    "assetCode": "NFR-MAS-BVM-02",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sunset Hues",
+    "category": "NFR"
+  },
+  "NFR-TBM-BVM-01": {
+    "assetCode": "NFR-TBM-BVM-01",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Sunset Hues",
+    "category": "NFR"
+  },
+  "POTI-MOBSTORE-25-09": {
+    "assetCode": "POTI-MOBSTORE-25-09",
+    "stationCode": "POTI",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "NFR-Shops-MJR-25-03": {
+    "assetCode": "NFR-Shops-MJR-25-03",
+    "stationCode": "MJR",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "PUB-OSN-MSC-TBMS-25-04": {
+    "assetCode": "PUB-OSN-MSC-TBMS-25-04",
+    "stationCode": "MSC",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Ninja Media creations",
+    "category": "NFR"
+  },
+  "NFR-GROCERY-MCPT-02": {
+    "assetCode": "NFR-GROCERY-MCPT-02",
+    "stationCode": "MCPT",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Narmadha Enterprises",
+    "category": "NFR"
+  },
+  "NFR-MAS-GAMINGZONE-01": {
+    "assetCode": "NFR-MAS-GAMINGZONE-01",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Meenakshi",
+    "category": "NFR"
+  },
+  "NFR-GROCERY-TRMN-04": {
+    "assetCode": "NFR-GROCERY-TRMN-04",
+    "stationCode": "TRMN",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "NFR-GROCERY-VLCY-03": {
+    "assetCode": "NFR-GROCERY-VLCY-03",
+    "stationCode": "VLCY",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "NFR-SHOPS-TBMS-2025-3": {
+    "assetCode": "NFR-SHOPS-TBMS-2025-3",
+    "stationCode": "TBMS",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "NFR-MAS-BMI-01": {
+    "assetCode": "NFR-MAS-BMI-01",
+    "stationCode": "MAS",
+    "stationName": "Dr. M. G. R. Chennai Central",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "PUB-OSN-CGL-lifts-01": {
+    "assetCode": "PUB-OSN-CGL-lifts-01",
+    "stationCode": "CGL-MLMR",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Supreme Media House",
+    "category": "NFR"
+  },
+  "NFR-Shop-TBM-25-04": {
+    "assetCode": "NFR-Shop-TBM-25-04",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "NFR-Leather-TBM-02": {
+    "assetCode": "NFR-Leather-TBM-02",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "NFR-Optical-TBM-02": {
+    "assetCode": "NFR-Optical-TBM-02",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "NFR-Stationary-TBM-02": {
+    "assetCode": "NFR-Stationary-TBM-02",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "NFR-BSS-STM-15": {
+    "assetCode": "NFR-BSS-STM-15",
+    "stationCode": "STM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Indofast swap Energy Pvt Ltd",
+    "category": "NFR"
+  },
+  "NFR-BSS-WST-14": {
+    "assetCode": "NFR-BSS-WST-14",
+    "stationCode": "WST",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Indofast swap Energy Pvt Ltd",
+    "category": "NFR"
+  },
+  "NFR-MOBSHOP-TBMEAST-25": {
+    "assetCode": "NFR-MOBSHOP-TBMEAST-25",
+    "stationCode": "TBM",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "NFR-MAGAZINE-25-01": {
+    "assetCode": "NFR-MAGAZINE-25-01",
+    "stationCode": "Tejas, DD, MYS Shatabdi & CBE Shatabdi",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "YP Digest",
+    "category": "NFR"
+  },
+  "NFR-SHOP-GI-2025-1": {
+    "assetCode": "NFR-SHOP-GI-2025-1",
+    "stationCode": "GI",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Apex Associates",
+    "category": "NFR"
+  },
+  "NFR-SHOP-KPD-2025-1": {
+    "assetCode": "NFR-SHOP-KPD-2025-1",
+    "stationCode": "KPD",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Hexion Solutions",
+    "category": "NFR"
+  },
+  "NFR-SHOP-PRGL-2025-1": {
+    "assetCode": "NFR-SHOP-PRGL-2025-1",
+    "stationCode": "PRGL",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Apex Associates",
+    "category": "NFR"
+  },
+  "NFR-SHOP-SPE-2025-1": {
+    "assetCode": "NFR-SHOP-SPE-2025-1",
+    "stationCode": "SPE",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "Praveen Enterprises",
+    "category": "NFR"
+  },
+  "NFR-SHOP-TRT-2025-1": {
+    "assetCode": "NFR-SHOP-TRT-2025-1",
+    "stationCode": "TRT",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "JV Enterprises",
+    "category": "NFR"
+  },
+  "NFR-TEJAS-2025": {
+    "assetCode": "NFR-TEJAS-2025",
+    "stationCode": "Tejas Express",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "YP Digest India",
+    "category": "NFR"
+  },
+  "NFR-OOH-KPD-2025": {
+    "assetCode": "NFR-OOH-KPD-2025",
+    "stationCode": "KPD",
+    "stationName": "Not Available",
+    "location": "Not Available",
+    "type": "Not Available",
+    "licenseeName": "SPEED ADS COMMUNICATIONS-VELLORE",
+    "category": "NFR"
+  }
+};
+
+        // Get asset code from URL parameter
+        function getAssetCodeFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('assetcode');
+        }
+
+        // Display asset information
+        function displayAssetInfo(assetCode) {
+            const asset = assetDatabase[assetCode];
+
+            if (!asset) {
+                document.getElementById('errorMessage').textContent = 
+                    'Asset not found. Please scan a valid QR code.';
+                document.getElementById('errorMessage').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('assetCode').textContent = asset.assetCode || '-';
+            document.getElementById('stationName').textContent = asset.stationName || '-';
+            document.getElementById('stationCode').textContent = asset.stationCode || '-';
+            document.getElementById('location').textContent = asset.location || '-';
+            document.getElementById('assetType').textContent = asset.type || '-';
+            document.getElementById('licenseeName').textContent = asset.licenseeName || '-';
+            document.getElementById('assetInfo').style.display = 'block';
+        }
+
+        // Save to Google Sheets silently in the background
+        function saveToGoogleSheets(data) {
+            // Use fetch with no-cors to send data silently
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            }).catch(error => {
+                // Silent fail - user doesn't need to know
+                console.log('Background save initiated');
+            });
+        }
+
+        // Handle form submission
+        document.getElementById('complaintForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const assetCode = getAssetCodeFromURL();
+            const asset = assetDatabase[assetCode];
+
+            if (!asset) {
+                alert('Asset information not found. Please scan a valid QR code.');
+                return;
+            }
+
+            // Get form data
+            const name = document.getElementById('name').value;
+            const mobile = document.getElementById('mobile').value;
+            const email = document.getElementById('email').value;
+            const pnruts = document.getElementById('pnruts').value;
+            const complaintType = document.getElementById('complaintType').value;
+            const complaint = document.getElementById('complaint').value;
+
+            // Validate mobile number
+            if (!/^[0-9]{10}$/.test(mobile)) {
+                alert('Please enter a valid 10-digit mobile number');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.querySelector('.submit-btn').style.display = 'none';
+
+            // Prepare data for Google Sheets (silent background save)
+            const sheetData = {
+                name: name,
+                mobile: mobile,
+                assetCode: asset.assetCode,
+                stationCode: asset.stationCode,
+                stationName: asset.stationName,
+                location: asset.location,
+                type: asset.type,
+                licenseeName: asset.licenseeName,
+                complaintType: complaintType,
+                complaint: complaint,
+                submittedOn: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+            };
+
+            // Save to Google Sheets silently (user won't see this)
+            saveToGoogleSheets(sheetData);
+
+            // Create WhatsApp message
+            const message = `*RAILWAY ASSET COMPLAINT*
+
+*Asset Details:*
+Asset Code: ${asset.assetCode}
+Station: ${asset.stationName}
+Station Code: ${asset.stationCode}
+Location: ${asset.location}
+Type: ${asset.type}
+Category: ${asset.category}
+Licensee: ${asset.licenseeName}
+
+*Complainant Details:*
+Name: ${name}
+Mobile: ${mobile}
+${email ? 'Email: ' + email : ''}
+PNR/UTS Number: ${pnruts}
+
+*Complaint Type:* ${complaintType}
+
+*Complaint Details:*
+${complaint}
+
+_Submitted on: ${new Date().toLocaleString()}_`;
+
+            // WhatsApp number (replace with your actual WhatsApp number)
+            const whatsappNumber = '919895130935'; // Replace with actual number
+
+            // Encode message for URL
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+            // Redirect to WhatsApp
+            setTimeout(() => {
+                window.location.href = whatsappURL;
+            }, 1000);
+        });
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const assetCode = getAssetCodeFromURL();
+
+            if (!assetCode) {
+                document.getElementById('errorMessage').textContent = 
+                    'No asset code provided. Please scan a QR code to continue.';
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('complaintForm').style.display = 'none';
+            } else {
+                displayAssetInfo(assetCode);
+            }
+        });
+    </script>
+    <footer>
+        <p>© 2025 IT Wing, Commercial Branch, Chennai Division, Southern Railway.</p>
+    </footer>
+</body>
+</html>
