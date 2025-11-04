@@ -3519,7 +3519,7 @@
         };
 
         // Google Sheet Configuration
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9Hr6Tsd-CsZr5F_ta4ti7Ub4PqRNXULxZKRnRy7aQnFhuqzBhJ0l2LZzPFCLi68qFTA/exec'; // Replace with your deployment URL
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyzJcQgcO0mMFBVzrgllNns0yqKrGHProGWxTpWs_IcE1UVwNZSLXrJIHMSTWjd17954Q/exec'; // Replace with your deployment URL
         const WHATSAPP_NUMBER = '6374713251'; // Your WhatsApp number
 
         // Global variables
@@ -3767,14 +3767,21 @@
             let message = `🚂 *Railway Asset Complaint/Feedback*\n\n`;
             message += `📍 *Asset Details*\n`;
             message += `Asset Code: ${data.assetCode}\n`;
-            message += `Station: ${data.stationName}\n\n`;
+            message += `Station Code: ${data.stationCode}\n`;
+            message += `Station Name: ${data.stationName}\n`;
+            message += `Location: ${data.location}\n`;
+            message += `Asset Type: ${data.assetType}\n`;
+            message += `Licensee: ${data.licenseeName}\n\n`;
+            
             message += `📋 *Issue Type:* ${data.issueType}\n`;
             message += `Sub-Type: ${data.subtypes}\n\n`;
+            
             message += `👤 *User Information*\n`;
             message += `Name: ${data.name}\n`;
             message += `Mobile: ${data.mobile}\n`;
             message += `PNR/UTS: ${data.pnr}\n`;
             if (data.email) message += `Email: ${data.email}\n`;
+            
             message += `\n📝 *Description:*\n${data.description}\n\n`;
             message += `_Submitted at: ${new Date().toLocaleString()}_`;
             
@@ -3788,7 +3795,11 @@
                 console.log('📊 Sending data to Google Sheets...', data);
                 const payload = {
                     assetCode: data.assetCode,
+                    stationCode: data.stationCode,
                     stationName: data.stationName,
+                    location: data.location,
+                    assetType: data.assetType,
+                    licenseeName: data.licenseeName,
                     issueType: data.issueType,
                     subtypes: data.subtypes,
                     name: data.name,
@@ -3848,12 +3859,17 @@
             // Show loading
             document.getElementById('loadingSpinner').style.display = 'block';
             document.getElementById('submitButton').disabled = true;
+            document.getElementById('errorMessage').classList.remove('show');
 
             try {
                 // Prepare data
                 const formData = {
                     assetCode: currentAsset.assetCode,
+                    stationCode: currentAsset.stationCode,
                     stationName: currentAsset.stationName,
+                    location: currentAsset.location,
+                    assetType: currentAsset.assetType,
+                    licenseeName: currentAsset.licenseeName,
                     issueType: document.getElementById('issueType').value,
                     subtypes: selectedSubtypes.join(', '),
                     name: document.getElementById('name').value.trim(),
