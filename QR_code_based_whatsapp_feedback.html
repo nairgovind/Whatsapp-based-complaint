@@ -3809,16 +3809,38 @@
             }
         }
 
-        function sendWhatsAppMessage(message) {
+        // function sendWhatsAppMessage(message) {
+        //     try {
+        //         const encodedMessage = encodeURIComponent(message);
+        //         const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+        //         window.open(whatsappURL, '_blank');
+        //         console.log('✅ WhatsApp message opened');
+        //     } catch (error) {
+        //         console.error('❌ Error opening WhatsApp:', error);
+        //     }
+        // }
+
+        function sendWhatsAppMessage(message, photoBase64) {
             try {
-                const encodedMessage = encodeURIComponent(message);
+                let fullMessage = message;
+                
+                // Add photo note if available
+                if (photoBase64) {
+                    fullMessage += `\n\n📸 Photo attached (Base64):\n${photoBase64.substring(0, 100)}...`;
+                    fullMessage += `\n\n[Photo will appear when opened in chat]`;
+                }
+                
+                const encodedMessage = encodeURIComponent(fullMessage);
                 const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+                
                 window.open(whatsappURL, '_blank');
-                console.log('✅ WhatsApp message opened');
+                console.log('✅ WhatsApp opened' + (photoBase64 ? ' with photo' : ''));
+                
             } catch (error) {
-                console.error('❌ Error opening WhatsApp:', error);
+                console.error('❌ Error:', error);
             }
         }
+
 
         async function handleSubmit(event) {
             event.preventDefault();
@@ -3874,7 +3896,7 @@
 
                 // Send WhatsApp
                 const whatsappMessage = formatWhatsAppMessage(formData);
-                sendWhatsAppMessage(whatsappMessage);
+                sendWhatsAppMessage(whatsappMessage, photoBase64);
 
                 // Reset after 3 seconds
                 setTimeout(() => {
