@@ -418,7 +418,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="pnr" class="required">PNR/UTS Number</label>
+                            <label for="pnr">PNR/UTS Number</label>
                             <input type="text" id="pnr" name="pnr" placeholder="10-digit PNR/UTS" maxlength="10" autocomplete="off">
                             <div class="field-info">Format: 10 digits-can be alphanumeric</div>
                             <div class="validation-error" id="pnrError">PNR/UTS must be exactly 10 digits</div>
@@ -3632,11 +3632,11 @@
                 e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
             });
 
-            document.getElementById('pnr').addEventListener('blur', () => {
-                const pnr = document.getElementById('pnr').value.trim();
-                 const isValid = /^[A-Z0-9]{10}$/.test(pnr.toUpperCase()); 
-                updateFieldValidation('pnr', isValid);
-            });
+            // document.getElementById('pnr').addEventListener('blur', () => {
+            //     const pnr = document.getElementById('pnr').value.trim();
+            //      const isValid = /^[A-Z0-9]{10}$/.test(pnr.toUpperCase()); 
+            //     updateFieldValidation('pnr', isValid);
+            // });
 
             document.getElementById('pnr').addEventListener('input', (e) => {
                e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
