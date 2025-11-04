@@ -3457,13 +3457,16 @@
                 return;
             }
 
+
             // Get form data
             const name = document.getElementById('name').value;
             const mobile = document.getElementById('mobile').value;
             const email = document.getElementById('email').value;
             const pnruts = document.getElementById('pnruts').value;
-            const complaintType = document.getElementById('complaintType').value;
-            const complaint = document.getElementById('complaint').value;
+            const issueType = document.getElementById('issueType').value;              // ✅ CHANGED
+            const issueSubType = document.getElementById('issueSubType').value;        // ✅ NEW
+            const description = document.getElementById('description').value;          // ✅ CHANGED
+
 
             // Validate mobile number
             if (!/^[0-9]{10}$/.test(mobile)) {
@@ -3514,10 +3517,11 @@ Mobile: ${mobile}
 ${email ? 'Email: ' + email : ''}
 PNR/UTS Number: ${pnruts}
 
-*Complaint Type:* ${complaintType}
+*Complaint Type:* ${issueType}
+*Complaint Sub-Type:* ${issueSubType}
 
 *Complaint Details:*
-${complaint}
+${description}
 
 _Submitted on: ${new Date().toLocaleString()}_`;
 
