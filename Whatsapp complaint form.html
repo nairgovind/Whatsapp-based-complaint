@@ -3407,12 +3407,12 @@
                     body: JSON.stringify(data)
                 })
                 .then(response => {
-                    console.log('Sheet save initiated');
-                    resolve(true);
+                    console.log("Data sent to sheet");
+                    return true;
                 })
                 .catch(error => {
                     console.error('Save error:', error);
-                    resolve(true); // Continue anyway
+                    return false;
                 });
             });
         }
@@ -3453,7 +3453,7 @@
 
 
         // Handle form submission
-        document.getElementById('complaintForm').addEventListener('submit', async function(e) {
+        document.getElementById('complaintForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const assetCode = getAssetCodeFromURL();
